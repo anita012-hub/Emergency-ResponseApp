@@ -1,0 +1,6 @@
+node_modules/
+.expo/
+.env
+
+Backend/node_modules/
+Backend/.env
