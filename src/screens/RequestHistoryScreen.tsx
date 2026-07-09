@@ -5,27 +5,26 @@
 // and a search bar. Tapping a row shows a bottom-sheet detail modal.
 // Loading state and empty state are both handled.
 
-import React, { useState, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  ScrollView,
   ActivityIndicator,
   Alert,
-  StatusBar,
   Dimensions,
-  Platform,
+  FlatList,
   Image,
+  Modal,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { emergencyService, EmergencyRequest } from '../services/emergencyService';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { EmergencyRequest, emergencyService } from '../services/emergencyService';
 
 const LOGO = require('../../assets/logo.png');
 const { height, width } = Dimensions.get('window');

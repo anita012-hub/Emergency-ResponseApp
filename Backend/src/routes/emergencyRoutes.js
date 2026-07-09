@@ -11,8 +11,8 @@ const {
   getMyEmergencyRequests,
   getEmergencyRequestById,
   updateEmergencyStatus,
+  getEmergencyLocation,
 } = require("../controllers/emergencyController");
-
 const { protect } = require("../middleware/authMiddleware");
 
 const {
@@ -46,6 +46,12 @@ router.patch(
   "/:id/status",
   protect,
   updateEmergencyStatus
+);
+
+router.get(
+  "/:id/location",
+  protect,
+  getEmergencyLocation
 );
 
 module.exports = router;

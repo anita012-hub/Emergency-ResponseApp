@@ -146,7 +146,8 @@ export const ConfirmationScreen = ({ route, navigation }: any) => {
           {/* Action Buttons */}
           <TouchableOpacity
             style={styles.trackButton}
-            onPress={() => navigation.navigate('Tracking', { requestId: request._id })}
+            onPress={() => navigation.navigate('Tracking', { 
+              requestId: request._id })}
           >
             <Text style={styles.trackButtonText}>📡 View Live Tracking</Text>
           </TouchableOpacity>

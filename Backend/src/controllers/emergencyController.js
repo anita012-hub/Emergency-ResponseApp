@@ -34,6 +34,7 @@ const createEmergencyRequest = async (req, res) => {
 // ===============================
 // Get Logged-in User Requests
 // ===============================
+
 const getMyEmergencyRequests = async (req, res) => {
   try {
     const requests = await EmergencyRequest.find({
@@ -58,24 +59,17 @@ const getMyEmergencyRequests = async (req, res) => {
 
   }
 };
-
-// ===============================
 // Get Single Emergency Request
-// ===============================
+
 const getEmergencyRequestById = async (req, res) => {
-
   try {
-
-    const request = await EmergencyRequest.findById(req.params.id)
-      .populate("requestedBy", "name email phone");
+    const request = await EmergencyRequest.findById(req.params.id);
 
     if (!request) {
-
       return res.status(404).json({
         success: false,
         message: "Emergency request not found",
       });
-
     }
 
     res.status(200).json({
@@ -84,14 +78,44 @@ const getEmergencyRequestById = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+  }
+};
+//getEmergencyLocation
 
+const getEmergencyLocation = async (req, res) => {
+  try {
+    const emergency = await EmergencyRequest.findById(req.params.id);
+
+    if (!emergency) {
+      return res.status(404).json({
+        success: false,
+        message: "Emergency request not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      userLocation: emergency.location,
+
+      ambulanceLocation: {
+        latitude: 31.5204,
+        longitude: 74.3587,
+      },
+
+      eta: "8 minutes",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -137,10 +161,10 @@ const updateEmergencyStatus = async (req, res) => {
   }
 
 };
-
 module.exports = {
   createEmergencyRequest,
   getMyEmergencyRequests,
   getEmergencyRequestById,
   updateEmergencyStatus,
+  getEmergencyLocation,
 };

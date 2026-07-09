@@ -24,21 +24,21 @@ const emergencyRequestSchema = new mongoose.Schema(
     },
 
     location: {
-      label: {
-        type: String,
-        required: true,
-      },
+  label: {
+    type: String,
+    default: "",
+  },
 
-      latitude: {
-        type: Number,
-        required: true,
-      },
+  latitude: {
+    type: Number,
+    required: true,
+  },
 
-      longitude: {
-        type: Number,
-        required: true,
-      },
-    },
+  longitude: {
+    type: Number,
+    required: true,
+  },
+},
 
     status: {
       type: String,
