@@ -4,12 +4,39 @@
 // Week 2: submit, getById, getByUser
 // Week 3: full history list, confirmation details
 
+
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./api";
 
 const TOKEN_KEY = "userToken";
 
 export const emergencyService = {
+
+  getMyEmergencyRequests: async () => {
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+
+      const response = await api.get(
+        "/emergency/my-requests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+        "Failed to load emergency requests."
+      );
+    }
+  },
+
+
   submitRequest: async (requestData: {
     emergencyType: string;
     notes: string;
@@ -19,6 +46,7 @@ export const emergencyService = {
       longitude: number;
     };
   }) => {
+
     try {
       const token = await AsyncStorage.getItem(TOKEN_KEY);
 
@@ -33,28 +61,89 @@ export const emergencyService = {
       );
 
       return response.data;
+
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || "Failed to submit emergency request."
+        error.response?.data?.message ||
+        "Failed to submit emergency request."
       );
     }
   },
 
+
   getRequestById: async (id: string) => {
-  try {
-    const token = await AsyncStorage.getItem(TOKEN_KEY);
 
-    const response = await api.get(`/emergency/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
 
-    return response.data;
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Failed to load request."
-    );
+      const response = await api.get(
+        `/emergency/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+        "Failed to load request."
+      );
+    }
+  },
+
+
+  getEmergencyLocation: async (id: string) => {
+
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+
+      const response = await api.get(
+        `/emergency/${id}/location`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+        "Failed to load emergency location."
+      );
+    }
+  },
+
+
+  cancelRequest: async (id: string) => {
+
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+
+      const response = await api.patch(
+        `/emergency/${id}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message ||
+        "Failed to cancel request."
+      );
+    }
   }
-},
+
 };

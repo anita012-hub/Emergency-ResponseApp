@@ -84,12 +84,11 @@ export const RequestHistoryScreen = ({ navigation }: any) => {
       try {
         const raw = await AsyncStorage.getItem('userData');
         if (raw) {
-          const user = JSON.parse(raw);
-          const id = user.id || 'user-1';
-          const name = user.name || 'User';
+         const id = user.id;
+
           setUserId(id);
-          await emergencyService.seedMockHistory(id, name);
-          await fetchHistory(id);
+
+           await fetchHistory();
         }
       } catch {
         setLoading(false);
@@ -98,19 +97,21 @@ export const RequestHistoryScreen = ({ navigation }: any) => {
     init();
   }, []);
 
-  const fetchHistory = async (uid: string) => {
-    setLoading(true);
-    try {
-      const response = await emergencyService.getByUser(uid);
-      const requests = response.data.requests;
-      setAllRequests(requests);
-      applyFilter(requests, activeFilter, searchQuery);
-    } catch (error: any) {
-      Alert.alert('Error', 'Could not load history. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchHistory = async () => {
+  setLoading(true);
+
+  try {
+    const requests = await emergencyService.getMyEmergencyRequests();
+
+    setAllRequests(requests);
+    applyFilter(requests, activeFilter, searchQuery);
+
+  } catch (error: any) {
+    Alert.alert('Error', 'Could not load history. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const applyFilter = useCallback(
     (requests: EmergencyRequest[], filter: string, query: string) => {
@@ -159,7 +160,7 @@ export const RequestHistoryScreen = ({ navigation }: any) => {
           onPress: async () => {
             await emergencyService.cancelRequest(item.id);
             setModalVisible(false);
-            await fetchHistory(userId);
+            await fetchHistory();
           },
         },
       ]
@@ -265,7 +266,7 @@ export const RequestHistoryScreen = ({ navigation }: any) => {
             <Text style={styles.headerTitle}>Request History</Text>
           </View>
 
-          <TouchableOpacity onPress={() => userId && fetchHistory(userId)} style={styles.refreshButton}>
+          <TouchableOpacity onPress={() => userId && fetchHistory()} style={styles.refreshButton}>
             <Text style={styles.refreshText}>↻</Text>
           </TouchableOpacity>
         </View>

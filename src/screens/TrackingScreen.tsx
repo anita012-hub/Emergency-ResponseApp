@@ -1,20 +1,22 @@
 // src/screens/TrackingScreen.tsx
 // Week 4 - Tracking screen with map simulation (no external dependencies)
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
-  StatusBar,
+  Alert,
   Animated,
   Dimensions,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, borderRadius, fontSizes, fontWeights, shadows } from '../styles/theme';
+import { emergencyService } from "../services/emergencyService";
+import { borderRadius, colors, fontSizes, fontWeights, shadows, spacing } from '../styles/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const MAP_HEIGHT = 220;
@@ -47,18 +49,21 @@ export const TrackingScreen = ({ route, navigation }: any) => {
   const [eta, setEta] = useState('8 minutes');
   const [status, setStatus] = useState('dispatched');
   const [request, setRequest] = useState<any>(null);
+  const [userLocation, setUserLocation] = useState({
+  latitude: 0,
+  longitude: 0,
+});
+
+const [ambulanceLocation, setAmbulanceLocation] = useState({
+  latitude: 0,
+  longitude: 0,
+});
+  
 
   // Animation
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // User location (mock)
-  const userLocation = {
-    latitude: 33.5651,
-    longitude: 73.0169,
-  };
-
-  // Ambulance location
-  const ambulanceLocation = AMBULANCE_ROUTES[ambulanceIndex] || AMBULANCE_ROUTES[0];
+  
 
   useEffect(() => {
     loadRequest();
@@ -70,26 +75,44 @@ export const TrackingScreen = ({ route, navigation }: any) => {
     };
   }, []);
 
-  const loadRequest = async () => {
-    setLoading(true);
-    // Simulate loading
-    setTimeout(() => {
-      setRequest({
-        id: requestId || 'REQ-12345',
-        emergencyType: 'medical',
-        status: 'dispatched',
-        notes: 'Patient needs immediate attention',
-        location: {
-          label: 'Rawalpindi, Punjab',
-          latitude: 33.5651,
-          longitude: 73.0169,
-        },
-        createdAt: new Date().toISOString(),
-      });
-      setLoading(false);
-    }, 1000);
-  };
+  
 
+  const loadRequest = async () => {
+  try {
+    setLoading(true);
+
+    if (!requestId) {
+      throw new Error("Request ID is missing.");
+    }
+
+    // Get request details
+    const requestResponse =
+      await emergencyService.getRequestById(requestId);
+
+    // Get location details
+    const locationResponse =
+      await emergencyService.getEmergencyLocation(requestId);
+
+    // Set request
+    setRequest(requestResponse.data);
+
+    setUserLocation(locationResponse.userLocation);
+
+    setAmbulanceLocation(locationResponse.ambulanceLocation);
+
+    setEta(locationResponse.eta);
+
+  } catch (error: any) {
+
+    Alert.alert(
+      "Error",
+      error.message || "Failed to load tracking information."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
   const startPulse = () => {
     Animated.loop(
       Animated.sequence([

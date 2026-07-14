@@ -26,21 +26,31 @@ interface LoginResponse {
 export const authService = {
   // Register
   register: async (userData: RegisterData): Promise<LoginResponse> => {
-    try {
-      const response = await api.post("/auth/register", userData);
+  try {
+    console.log("Sending data:", userData);
+    console.log("Base URL:", api.defaults.baseURL);
 
-      const { token, user } = response.data;
+    const response = await api.post("/auth/register", userData);
 
-      await AsyncStorage.setItem(TOKEN_KEY, token);
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+    console.log("SUCCESS:", response.data);
 
-      return response.data;
-    } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Registration failed"
-      );
-    }
-  },
+    const { token, user } = response.data;
+
+    await AsyncStorage.setItem(TOKEN_KEY, token);
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+
+    return response.data;
+  } catch (error: any) {
+    console.log("========== AXIOS ERROR ==========");
+    console.log("message:", error.message);
+    console.log("code:", error.code);
+    console.log("response:", error.response?.data);
+    console.log("config:", error.config);
+    console.log("================================");
+
+    throw new Error(error.response?.data?.message || error.message);
+  }
+},
 
   // Login
   login: async (
